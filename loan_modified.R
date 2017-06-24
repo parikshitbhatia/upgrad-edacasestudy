@@ -10,6 +10,9 @@ library(ggplot2)
 loan<-loan[ , ! apply( loan , 2 , function(x) all(is.na(x)) ) ]
 loan <- loan[,-which(colMeans(loan==0 | is.na(loan)) >0.7)]
 
+#remove URL
+loan$url <- NULL
+
 #remove duplicate values
 loan <- loan[,!apply(loan , 2 , function(x) length(unique(x)) == 1)]
 
@@ -41,6 +44,12 @@ for (i in 1:ncol(loan)){
 }
 
 #data cleaning completes here so we are writing all the data into a new file modified_loan
+
+### Derived Column loan_amnt_annual_inc_ratio rounded off %
+loan['loan_amnt_annual_inc_ratio'] = round((loanT$loan_amnt / loanT$annual_inc) * 100)
+
+loan['monthly_income'] <- (loan$annual_inc/12)
+loan['monthly_installment_monthly_inc_perc'] <- round((loan$installment /loan$monthly_income) * 100)
 
 write.csv(loan,"modified_loan.csv")
 
@@ -184,4 +193,8 @@ ggplot(loan, aes(x = loan$emp_length)) + geom_bar(position = "fill",aes(fill=loa
 
 ggplot(loan, aes(x = loan$emp_length,col=loan$loan_status)) + geom_bar(stat = "count")
 
-###
+### Loan where montly installment is around 5-10% of monthly income on Mortgage/Rent are high defaulters
+ggplot(charged_off, aes(x = charged_off$monthly_installment_monthly_inc_perc)) + geom_bar(stat = "count")
+ggplot(charged_off, aes(x = charged_off$monthly_installment_monthly_inc_perc)) + geom_bar(stat = "count",aes(fill=charged_off$emp_length)) + facet_wrap(~ charged_off$home_ownership)
+
+

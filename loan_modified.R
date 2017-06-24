@@ -13,7 +13,7 @@ loan <- loan[,-which(colMeans(loan==0 | is.na(loan)) >0.7)]
 #remove URL
 loan$url <- NULL
 
-#remove duplicate values
+#remove column with duplicate values
 loan <- loan[,!apply(loan , 2 , function(x) length(unique(x)) == 1)]
 
 #rounding off the funded_amt_inv, annual_inc

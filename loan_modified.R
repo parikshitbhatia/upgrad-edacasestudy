@@ -2,13 +2,16 @@
 library(ggplot2)
 
 #Load Banking data
-loan <- read.csv("data/loan.csv")
+loan <- read.csv("loan 2.csv")
 
 
 #remove the column with na values and more than 70% with 0
 loan <- loan[,!apply(loan , 2 , function(x)
   all(is.na(x)))]
 loan <- loan[, -which(colMeans(loan == 0 | is.na(loan)) > 0.7)]
+
+##PB removing column having same values##
+loan <- loan[,!apply(loan , 2 , function(x) length(unique(x)) == 1)]
 
 #data cleaning
 
@@ -72,3 +75,20 @@ ggplot(charged_off, aes(x = home_ownership)) + geom_bar(stat = "count") +
 
 ggplot(charged_off, aes(x = grade)) + geom_bar(stat = "count") + geom_text(stat =
                                                                              'count', aes(label = ..count..), vjust = -1)
+
+###PB###
+View(loan)
+
+
+#Among charged off term of loan Does term matters
+ggplot(charged_off, aes(x = charged_off$term)) + geom_bar(stat = "count") +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -1)
+
+#Term 36 ->3227 and 60 has 2400 so not good indication for charged off.
+
+
+# charged off person with purposes, debt consolidation is higher one
+ggplot(charged_off, aes(x = charged_off$purpose)) + geom_bar(stat = "count")
+
+# For overall Population of loan we see that higher % of people with purpose as small business as charged off
+ggplot(loan, aes(x = loan$purpose,col = loan$loan_status)) + geom_bar(position = "fill")
